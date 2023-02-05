@@ -95,6 +95,15 @@ def create_app(test_config=None):
     Clicking on the page numbers should update the questions.
     """
 
+    """
+    @TODO:
+    Create a GET endpoint to get questions based on category.
+
+    TEST: In the "List" tab / main screen, clicking on one of the
+    categories in the left column will cause only questions of that
+    category to be shown.
+    """
+
     @app.route('/questions')
     def get_questions():
         category = request.args.get('category')
@@ -151,6 +160,17 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.
     """
 
+    """
+    @TODO:
+    Create a POST endpoint to get questions based on a search term.
+    It should return any questions for whom the search term
+    is a substring of the question.
+
+    TEST: Search by any phrase. The questions list will update to include
+    only question that include that string within their question.
+    Try using the word "title" to start.
+    """
+
     @app.route('/questions', methods=["POST"])
     def create_question():
         body = request.get_json()
@@ -158,11 +178,18 @@ def create_app(test_config=None):
         new_answer = body.get("answer", None)
         new_difficulty = body.get("difficulty", None)
         new_category = body.get("category", None)
-        search = body.get("search", None)
+        search = body.get("searchTerm", None)
 
         try:
             if search:
-                print(search)
+                selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search)))
+                paginated_questions = paginate_request(request, selection)
+
+                return jsonify({
+                    'success': True,
+                    'questions': paginated_questions,
+                    "total_questions": len(selection.all())
+                })
             else:
                 question = Question(question=new_question, answer=new_answer, difficulty=new_difficulty, category=new_category)
                 question.insert()
@@ -182,26 +209,6 @@ def create_app(test_config=None):
 
     """
     @TODO:
-    Create a POST endpoint to get questions based on a search term.
-    It should return any questions for whom the search term
-    is a substring of the question.
-
-    TEST: Search by any phrase. The questions list will update to include
-    only question that include that string within their question.
-    Try using the word "title" to start.
-    """
-
-    """
-    @TODO:
-    Create a GET endpoint to get questions based on category.
-
-    TEST: In the "List" tab / main screen, clicking on one of the
-    categories in the left column will cause only questions of that
-    category to be shown.
-    """
-
-    """
-    @TODO:
     Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random questions within the given category,
@@ -211,6 +218,33 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
+
+    @app.route('/quizzes', methods=["POST"])
+    def play_quiz():
+        body = request.get_json()
+        previous_questions = body.get("previous_questions", None)
+        quiz_category = body.get('quiz_category', None)
+        quiz_category_id = int(quiz_category['id'])
+        filter_condition = Question.category == quiz_category_id if quiz_category_id > 0 else Question.category > 0
+
+        selection = Question.query.filter(
+            Question.id not in previous_questions and filter_condition
+        ).order_by(
+            func.random()
+        ).first()
+
+        return jsonify({
+            'success': True,
+            'previous_questions': previous_questions,
+            'question': {
+                'id': selection.id,
+                'question': selection.question,
+                'answer': selection.answer,
+                'category': selection.category
+            }
+        })
+
+        
 
     """
     @TODO:

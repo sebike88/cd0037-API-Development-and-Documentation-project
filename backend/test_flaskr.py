@@ -89,6 +89,42 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "not allowed")
 
+    def test_search_question_with_results(self):
+        res = self.client().post("/questions", json={"searchTerm": "who"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["total_questions"])
+        self.assertGreater(len(data["questions"]), 0)
+
+    def test_search_question_without_results(self):
+        res = self.client().post("/questions", json={"searchTerm": "asfawfawga"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["total_questions"], 0)
+        self.assertEqual(len(data["questions"]), 0)
+
+    def test_quizes(self):
+        res = self.client().post("/quizzes", json={
+            "previous_questions": [53],
+            "quiz_category": {
+                "type": "click",
+                "id": 0
+            }
+        })
+        data = json.loads(res.data)
+
+        previous_questions = data['previous_questions']
+        previous_questions.append(data['question']['id'])
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data['question']['id'] != 53)
+        self.assertEqual(data["previous_questions"], [53, data['question']['id']])
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
