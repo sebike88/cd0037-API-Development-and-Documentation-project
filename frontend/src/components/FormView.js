@@ -19,6 +19,7 @@ class FormView extends Component {
       url: `/categories`, //TODO: update request URL
       type: 'GET',
       success: (result) => {
+        console.log(result)
         this.setState({ categories: result.categories });
         return;
       },
@@ -62,6 +63,7 @@ class FormView extends Component {
   };
 
   render() {
+    console.log(this.state.categories)
     return (
       <div id='add-form'>
         <h2>Add a New Trivia Question</h2>
