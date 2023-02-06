@@ -89,7 +89,7 @@ class QuestionView extends Component {
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({ searchTerm: searchTerm }),
+      data: JSON.stringify({ search_term: searchTerm }),
       xhrFields: {
         withCredentials: true,
       },

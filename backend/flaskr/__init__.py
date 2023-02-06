@@ -177,10 +177,12 @@ def create_app(test_config=None):
         new_answer = body.get("answer", None)
         new_difficulty = body.get("difficulty", None)
         new_category = body.get("category", None)
-        search = body.get("searchTerm", None)
+        search = body.get("search_term", None)
+        is_question_data_none = (new_question == None) or (new_answer == None) or (new_difficulty == None) or (new_category == None)
 
         try:
             if search:
+                print('search running')
                 selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search)))
                 paginated_questions = paginate_request(request, selection)
 
@@ -189,6 +191,9 @@ def create_app(test_config=None):
                     'questions': paginated_questions,
                     "total_questions": len(selection.all())
                 })
+            elif is_question_data_none:
+                print('error')
+                abort()
             else:
                 question = Question(question=new_question, answer=new_answer, difficulty=new_difficulty, category=new_category)
                 question.insert()
@@ -258,6 +263,14 @@ def create_app(test_config=None):
             "error": 404,
             "message": 'resource not found'
         }), 404
+    
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": 'bad request'
+        }), 400
 
     @app.errorhandler(422)
     def unporcessable(error):

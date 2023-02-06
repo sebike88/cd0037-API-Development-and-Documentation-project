@@ -195,6 +195,90 @@ You will need to provide detailed documentation of your API endpoints including 
 }
 ```
 
+`POST '/api/v1.0/questions/<int:question_id>'`
+
+- Inserts a new question in the app
+- Request Arguments:
+  - `question`: String that contains the question
+  - `answer`: String that contains the answer
+  - `difficulty`: Number that marks the difficulty of the question
+  - `category`: Number that represents the id of the category that the question is grouped in
+
+- Returns: 
+  - An object with a `categories` key, that contains an object of `id: category_string` key: value pairs.
+  - A number with a `created` key that represents id of the question that was added.
+  - An array of 10 questions, each containing an object with `question: question_string`, `answer: answer_string`, `category: category_id`, `difficulty: difficulty_number`, `id: id_number` key: value pairs
+  - A boolean with `success` key and value of `True`
+  - A number with a `total_questions` key that represents the total count of all the questions
+
+```json
+{
+    "categories": {
+        "1": "Science",
+        "2": "Art",
+        "3": "Geography",
+        "4": "History",
+        "5": "Entertainment",
+        "6": "Sports"
+    },
+    "created": 76,
+    "questions": [
+        {
+            "answer": "Uruguay",
+            "category": 6,
+            "difficulty": 4,
+            "id": 11,
+            "question": "Which country won the first ever soccer World Cup in 1930?"
+        },
+        {
+            "answer": "Lake Victoria",
+            "category": 3,
+            "difficulty": 2,
+            "id": 13,
+            "question": "What is the largest lake in Africa?"
+        },
+        ...
+    ],
+    "success": true,
+    "total_questions": 56
+}
+```
+
+`POST '/api/v1.0/questions/<int:question_id>'`
+
+- Search questions by their `question` value
+- Request Arguments:
+  - `searchTerm`: String that contains the search term
+
+- Returns: 
+  - An array of 10 questions, each containing an object with `question: question_string`, `answer: answer_string`, `category: category_id`, `difficulty: difficulty_number`, `id: id_number` key: value pairs
+  - A boolean with `success` key and value of `True`
+  - A number with a `total_questions` key that represents the total count of all the questions
+
+```json
+{
+    "questions": [
+        {
+            "answer": "Alexander Fleming",
+            "category": 1,
+            "difficulty": 3,
+            "id": 21,
+            "question": "Who discovered penicillin?"
+        },
+        {
+            "answer": "Marcellus Gilmore Edson",
+            "category": 3,
+            "difficulty": 4,
+            "id": 24,
+            "question": "Who invented peanut butter?"
+        },
+        ...
+    ],
+    "success": true,
+    "total_questions": 11
+}
+```
+
 ## Testing
 
 Write at least one test for the success and at least one error behavior of each endpoint using the unittest library.
