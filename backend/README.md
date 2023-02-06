@@ -248,7 +248,7 @@ You will need to provide detailed documentation of your API endpoints including 
 
 - Search questions by their `question` value
 - Request Arguments:
-  - `searchTerm`: String that contains the search term
+  - `search_term`: String that contains the search term
 
 - Returns: 
   - An array of 10 questions, each containing an object with `question: question_string`, `answer: answer_string`, `category: category_id`, `difficulty: difficulty_number`, `id: id_number` key: value pairs
@@ -276,6 +276,36 @@ You will need to provide detailed documentation of your API endpoints including 
     ],
     "success": true,
     "total_questions": 11
+}
+```
+
+`POST '/api/v1.0/quizzes'`
+
+- Runs the trivia app
+- Request Arguments:
+  - `previous_questions`: List of previous question id's
+  - `quiz_category`: Dictionary that contains a specific category data:
+     - `id`: Category id
+     - `type`: String containing the category title
+  - if no category is selected in the app the `quiz_category` values should be `"id": 0` and `"type": "click"`
+
+- Returns: 
+  - An array of integers with `previous_questions` key that contains the id's of the previous questions in the trivia
+  - An object with `question` with `question: question_string`, `answer: answer_string`, `category: category_id`, `id: id_number` key: value pairs
+  - A boolean with `success` key and value of `True`
+
+```json
+{
+    "previous_questions": [
+        53
+    ],
+    "question": {
+        "answer": "Marcellus Gilmore Edson",
+        "category": 1,
+        "id": 28,
+        "question": "Who invented peanut butter?"
+    },
+    "success": true
 }
 ```
 
