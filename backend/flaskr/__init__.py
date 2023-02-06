@@ -8,6 +8,7 @@ from sqlalchemy import func
 from models import setup_db, Question, Category
 
 RESULTS_PER_PAGE = 10
+API_VERSION = '/api/v1.0'
 
 def paginate_request(request, selection):
     page = request.args.get('page', 1, type=int)
@@ -41,17 +42,15 @@ def create_app(test_config=None):
     setup_db(app)
 
     """
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs ✅
+    ✅: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs 
     """
-    CORS(app, resources={r"/categories": {"origins": "*"}})
+    CORS(app, resources={r"/": {"origins": "*"}})
 
     """
-    @TODO: Use the after_request decorator to set Access-Control-Allow ✅
+    ✅: Use the after_request decorator to set Access-Control-Allow ✅
     """
     @app.after_request
     def after_request(response):
-        # response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        # response.headers.add('Access-Control-Allow-Methods', 'GET')
         response.headers.add(
             "Access-Control-Allow-Headers", "Content-Type,Authorization,true"
         )
@@ -62,12 +61,12 @@ def create_app(test_config=None):
         return response
 
     """
-    @TODO:
+    ✅
     Create an endpoint to handle GET requests
     for all available categories.
     """
 
-    @app.route('/categories')
+    @app.route(f'{API_VERSION}/categories')
     def get_categories():
         selection = Category.query.order_by(Category.id).all()
         formatted_categories = {category.id : category.type for category in selection}
@@ -104,7 +103,7 @@ def create_app(test_config=None):
     category to be shown.
     """
 
-    @app.route('/questions')
+    @app.route(f'{API_VERSION}/questions')
     def get_questions():
         category = request.args.get('category')
 
@@ -130,7 +129,7 @@ def create_app(test_config=None):
     This removal will persist in the database and when you refresh the page.
     """
 
-    @app.route("/questions/<int:question_id>", methods=["DELETE"])
+    @app.route(f'{API_VERSION}/questions/<int:question_id>', methods=["DELETE"])
     def delete_question(question_id):
         try:
             question = Question.query.filter(Question.id == question_id).one_or_none()
@@ -171,7 +170,7 @@ def create_app(test_config=None):
     Try using the word "title" to start.
     """
 
-    @app.route('/questions', methods=["POST"])
+    @app.route(f'{API_VERSION}/questions', methods=["POST"])
     def create_question():
         body = request.get_json()
         new_question = body.get("question", None)
@@ -219,7 +218,7 @@ def create_app(test_config=None):
     and shown whether they were correct or not.
     """
 
-    @app.route('/quizzes', methods=["POST"])
+    @app.route(f'{API_VERSION}/quizzes', methods=["POST"])
     def play_quiz():
         body = request.get_json()
         previous_questions = body.get("previous_questions", None)
