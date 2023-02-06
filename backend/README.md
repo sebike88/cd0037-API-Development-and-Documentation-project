@@ -101,7 +101,7 @@ You will need to provide detailed documentation of your API endpoints including 
 
 - Fetches:
   - a list of 10 questions per page
-- Query params:
+- Request params:
     - `page`: the requested page
     - `category`: category id used to filted questions by category
     - Exampe: `/api/v1.0/questions?page=1&category=2`
@@ -147,6 +147,51 @@ You will need to provide detailed documentation of your API endpoints including 
     ],
     "success": true,
     "total_questions": 56
+}
+```
+
+`DELETE '/api/v1.0/questions/<int:question_id>'`
+
+- Deletes a question by id:
+  - `question_id`: Integer that represents the question id
+
+- Returns: 
+  - An object with a `categories` key, that contains an object of `id: category_string` key: value pairs.
+  - A number with a `deleted` key that represents id of the question that was deleted.
+  - An array of 10 questions, each containing an object with `question: question_string`, `answer: answer_string`, `category: category_id`, `difficulty: difficulty_number`, `id: id_number` key: value pairs
+  - A boolean with `success` key and value of `True`
+  - A number with a `total_questions` key that represents the total count of all the questions
+
+```json
+{
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "deleted": 74,
+  "questions": [
+    {
+      "answer": "Uruguay",
+      "category": 6,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    },
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    ...
+  ],
+  "success": true,
+  "total_questions": 55
 }
 ```
 
