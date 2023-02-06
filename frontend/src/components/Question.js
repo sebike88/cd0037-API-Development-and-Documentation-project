@@ -14,10 +14,27 @@ class Question extends Component {
   }
 
   render() {
-    const { question, answer, category, difficulty } = this.props;
+    const { questionId, question, answer, category, difficulty, rating } = this.props;
     return (
       <div className='Question-holder'>
         <div className='Question'>{question}</div>
+        <div
+          className="fa"
+        >
+          {
+            Array.from(Array(5).keys()).map((index) => (
+              <label
+                className={`fa fa-star ${index + 1 <= rating ? 'checked' : ''}`}
+                htmlFor={`rating_${questionId}_${index}`}
+                data-rating={rating}
+                
+                key={`rating_${questionId}_${index}`}
+              >
+                <input id={`rating_${questionId}_${index}`} name={`rating_${questionId}`} type="radio" onClick={() =>  this.props.questionAction('PATCH', index + 1)} />
+              </label>
+            ))
+          }
+        </div>
         <div className='Question-status'>
           <img
             className='category'

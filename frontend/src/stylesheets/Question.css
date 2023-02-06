@@ -73,3 +73,33 @@ img.category {
 img.delete {
   width: 20px;
 }
+
+.fa {
+  display: inline-block;
+  font-size: 22px;
+  text-rendering: auto;
+  padding: 0.25rem 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+}
+
+.fa-star {
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.fa-star input {
+  visibility: hidden;
+  position: absolute;
+  height: 1px;
+  width: 1px;
+}
+
+.fa-star:before {
+  content: '★ ';
+}
+
+
+.checked {
+  color: orange;
+}

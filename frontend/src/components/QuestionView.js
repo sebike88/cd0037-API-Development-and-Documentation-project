@@ -109,7 +109,28 @@ class QuestionView extends Component {
     });
   };
 
-  questionAction = (id) => (action) => {
+  questionAction = (id) => (action, rating) => {
+    if (action === 'PATCH') {
+      console.log('patch', id, rating)
+
+      $.ajax({
+        url: `${this.state.apiVersion}/questions/${id}`, //TODO: update request URL
+        type: 'PATCH',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({ rating: rating }),
+        xhrFields: {
+          withCredentials: true,
+        },
+        success: (result) => {
+          this.getQuestions();
+        },
+        error: (error) => {
+          alert('Unable to update question rating. Please try your request again');
+          return;
+        },
+      });
+    }
     if (action === 'DELETE') {
       if (window.confirm('are you sure you want to delete the question?')) {
         $.ajax({
@@ -162,10 +183,12 @@ class QuestionView extends Component {
           {this.state.questions.map((q, ind) => (
             <Question
               key={q.id}
+              questionId={q.id}
               question={q.question}
               answer={q.answer}
               category={this.state.categories[q.category]}
               difficulty={q.difficulty}
+              rating={q.rating}
               questionAction={this.questionAction(q.id)}
             />
           ))}

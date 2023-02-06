@@ -129,15 +129,29 @@ def create_app(test_config=None):
     This removal will persist in the database and when you refresh the page.
     """
 
-    @app.route(f'{API_VERSION}/questions/<int:question_id>', methods=["DELETE"])
+    @app.route(f'{API_VERSION}/questions/<int:question_id>', methods=["DELETE", "PATCH"])
     def delete_question(question_id):
         try:
-            question = Question.query.filter(Question.id == question_id).one_or_none()
+            if request.method == 'PATCH':
+                body = request.get_json()
+                new_rating = body.get("rating", None)
+                question = Question.query.filter(Question.id == question_id).one_or_none()
 
-            if question is None:
-                abort(404)
-            
-            question.delete()
+                if question is None:
+                    abort(404)
+
+                question.rating = new_rating
+
+                question.update()
+
+            elif request.method == 'DELETE':
+                question = Question.query.filter(Question.id == question_id).one_or_none()
+
+                if question is None:
+                    abort(404)
+                
+                question.delete()
+
             questions = questions_query()
 
             questions['deleted'] = question.id
