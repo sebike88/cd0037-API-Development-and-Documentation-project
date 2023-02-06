@@ -16,12 +16,13 @@ class QuizView extends Component {
       currentQuestion: {},
       guess: '',
       forceEnd: false,
+      apiVersion: '/api/v1.0'
     };
   }
 
   componentDidMount() {
     $.ajax({
-      url: `/categories`, //TODO: update request URL
+      url: `${this.state.apiVersion}/categories`, //TODO: update request URL
       type: 'GET',
       success: (result) => {
         this.setState({ categories: result.categories });
@@ -49,7 +50,7 @@ class QuizView extends Component {
     }
 
     $.ajax({
-      url: '/quizzes', //TODO: update request URL
+      url: `${this.state.apiVersion}/quizzes`, //TODO: update request URL
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
