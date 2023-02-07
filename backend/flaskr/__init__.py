@@ -36,7 +36,11 @@ def questions_query():
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
-    setup_db(app)
+    if test_config:
+        setup_db(app, test_config['database_path'])
+    else:
+        setup_db(app)
+        
     CORS(app, resources={r"/": {"origins": "*"}})
 
     @app.after_request
