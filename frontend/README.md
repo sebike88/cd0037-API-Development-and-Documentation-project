@@ -203,7 +203,7 @@ You can optionally update this game play to increase the number of questions or 
 
 ```json
 {
-  "searchTerm": "this is the term the user is looking for"
+  "search_term": "this is the term the user is looking for"
 }
 ```
 
