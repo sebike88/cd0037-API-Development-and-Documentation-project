@@ -20,6 +20,16 @@ def paginate_request(request, selection):
 
     return current_response
 
+def paginate_post_request(body, selection):
+    page = body.get('page') or 1
+    start = (page - 1) * RESULTS_PER_PAGE
+    end = start + RESULTS_PER_PAGE
+    
+    formatted_response = [question.format() for question in selection]
+    current_response = formatted_response[start:end]
+
+    return current_response
+
 def questions_query():
     selection = Question.query.order_by(Question.id).all()
     categories = Category.query.order_by(Category.id).all()
@@ -31,6 +41,7 @@ def questions_query():
         "questions": paginated_questions,
         "total_questions": len(selection),
         "categories": formatted_categories,
+        "current_category": 0,
     }
 
 def create_app(test_config=None):
@@ -82,10 +93,14 @@ def create_app(test_config=None):
                     abort()
 
                 paginated_questions = paginate_request(request, selection)
+                categories = Category.query.order_by(Category.id).all()
+                formatted_categories = {category.id : category.type for category in categories}
+
 
                 return jsonify({
                     'questions': paginated_questions,
-                    'category': current_category.id,
+                    'current_category': current_category.id,
+                    'categories': formatted_categories,
                     'total_questions': len(selection),
                     "success": True,
                 })
@@ -134,24 +149,30 @@ def create_app(test_config=None):
 
     @app.route(f'{API_VERSION}/questions', methods=["POST"])
     def create_question():
+        error_id = 422
         body = request.get_json()
         new_question = body.get("question", None)
         new_answer = body.get("answer", None)
         new_difficulty = body.get("difficulty", None)
         new_category = body.get("category", None)
         search = body.get("search_term", None)
-        
+
         is_question_data_none = (new_question == None
-        ) or (new_answer == None
-        ) or (new_difficulty == None
-        ) or (new_category == None)
+        ) and (new_answer == None
+        ) and (new_difficulty == None
+        ) and (new_category == None)
+
+        get_questions_based_on_category = (new_question == None
+        ) and (new_answer == None
+        ) and (new_difficulty == None
+        ) and (new_category != None)
 
         try:
             if search:
                 selection = Question.query.order_by(Question.id).filter(
                     Question.question.ilike('%{}%'.format(search))
                 )
-                paginated_questions = paginate_request(request, selection)
+                paginated_questions = paginate_post_request(body, selection)
 
                 return jsonify({
                     'success': True,
@@ -160,6 +181,20 @@ def create_app(test_config=None):
                 })
             elif is_question_data_none:
                 abort()
+            elif get_questions_based_on_category:
+                selection = Question.query.order_by(Question.id).filter(
+                    Question.category == new_category
+                ).all()
+
+                paginated_questions = paginate_post_request(body, selection)
+                category = Category.query.filter(Category.id == new_category).one_or_none()
+
+                return jsonify({
+                    'success': True,
+                    'current_category': category.id,
+                    'questions': paginated_questions,
+                    "total_questions": len(selection)
+                })
             else:
                 question = Question(question=new_question,
                     answer=new_answer,
@@ -174,7 +209,7 @@ def create_app(test_config=None):
 
                 return jsonify(questions)
         except:
-            abort(422)
+            abort(error_id)
 
     @app.route(f'{API_VERSION}/quizzes', methods=["POST"])
     def play_quiz():
@@ -248,6 +283,14 @@ def create_app(test_config=None):
             "error": 405,
             "message": 'not allowed'
         }), 405
+    
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": 'internal server error'
+        }), 500
 
     return app
 
