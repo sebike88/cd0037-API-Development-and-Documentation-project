@@ -229,24 +229,29 @@ def create_app(test_config=None):
                 error_id = 404
                 abort()
 
-            selection = Question.query.filter(
-                Question.id not in previous_questions and filter_condition
-            ).order_by(
-                func.random()
-            ).first()
+            selection = Question.query.filter(filter_condition).order_by(func.random())
+            main_question = selection.filter(Question.id.notin_(previous_questions)).first()
 
             if selection is None:
                 error_id = 404
                 abort()
 
+            if main_question is None:
+                return jsonify({
+                    'success': True,
+                    'previous_questions': previous_questions,
+                    'total_questions': len(selection.all()),
+                })
+
             return jsonify({
                 'success': True,
                 'previous_questions': previous_questions,
+                'total_questions': len(selection.all()),
                 'question': {
-                    'id': selection.id,
-                    'question': selection.question,
-                    'answer': selection.answer,
-                    'category': selection.category
+                    'id': main_question.id,
+                    'question': main_question.question,
+                    'answer': main_question.answer,
+                    'category': main_question.category
                 }
             })
         except:
